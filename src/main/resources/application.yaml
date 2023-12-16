@@ -1,0 +1,47 @@
+# docs.spring.io/spring-boot/docs/current/reference/html/actuator.html
+management:
+  endpoint:
+    health:
+      enabled: true
+    info:
+      enabled: true
+    # view all supported metrics names at http://localhost:8080/actuator/metrics
+    # to view metrics for a properties: http://localhost:8080/actuator/metrics/<property>
+    metrics:
+      enabled: true
+    env:
+      enabled: true
+    configprops:
+      enabled: true
+    # you could send a post request to change log level at runtime
+    # http://localhost:8080/actuator/loggers/com.example.demo
+    # {"configuredLevel": "DEBUG"}
+    loggers:
+      enabled: true
+    beans:
+      enabled: true
+    httptrace:     # need to define a bean explicitly
+      enabled: true
+    auditevents:  # need to define a bean explicitly
+      enabled: true
+  endpoints:
+    # by default, only the shutdown endpoint is disabled
+    # explicitly enabling actuator endpoints saves creation of unnecessary beans
+    enabled-by-default: false
+    web:
+      # you'd need to expose the actuator endpoint explicitly
+      exposure:
+        include:
+          - health
+          - info
+          - metrics
+          - env
+          - configprops
+          - loggers
+          - beans
+          - httptrace
+          - auditevents
+
+# port where this application would run
+server:
+  port: 8080
