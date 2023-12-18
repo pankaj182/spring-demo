@@ -1,4 +1,4 @@
-package com.neatcode.euro.actuator.config;
+package com.neatcode.actuator.contributor;
 
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;

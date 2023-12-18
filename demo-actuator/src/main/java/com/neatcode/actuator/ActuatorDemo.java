@@ -1,13 +1,13 @@
-package com.neatcode.euro;
+package com.neatcode.actuator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
-public class EuroApplication {
+
+@SpringBootApplication(scanBasePackages = "com.neatcode")
+public class ActuatorDemo {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EuroApplication.class, args);
+		SpringApplication.run(ActuatorDemo.class, args);
 	}
-
 }

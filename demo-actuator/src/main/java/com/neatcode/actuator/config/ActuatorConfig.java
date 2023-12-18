@@ -1,4 +1,4 @@
-package com.neatcode.euro.actuator.config;
+package com.neatcode.actuator.config;
 
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository;
@@ -6,12 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class Actuator {
-
-    @Bean
-    public HttpTraceRepository httpTraceRepository() {
-        return new InMemoryHttpTraceRepository();
-    }
+public class ActuatorConfig {
 
     @Bean
     public AuditEventRepository auditEventRepository() {

@@ -1,4 +1,4 @@
-package com.neatcode.euro.actuator.config;
+package com.neatcode.actuator.indicator;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;

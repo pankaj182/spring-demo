@@ -13,25 +13,40 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>spring-demo</name>
 	<description>Spring Tutorials</description>
+<!--	notice the packaging here, it is pom in base, jar in modules-->
+	<packaging>pom</packaging>
+
 	<properties>
 		<java.version>17</java.version>
 	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
 
+	<modules>
+		<module>services-common</module>
+		<module>demo-actuator</module>
+	</modules>
+
+	<dependencies>
+
+<!--	lombok annotations to reduce boilerplates-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+<!--	for custom actuators-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+<!--	others-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 
 	<build>
