@@ -1,0 +1,16 @@
+
+server:
+  port: 8081
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+  consumer:
+    group-id: myGroup
+
+swagger:
+  basePackage: com.neatcode.kafka.controller
+  path: /api/.*
+  title: Kafka Demo
+  description: REST API to interact with Demo Kafka Application
+  version: 1.0.0-SNAPSHOT
