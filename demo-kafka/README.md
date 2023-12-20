@@ -102,6 +102,62 @@ How does kafka achieve high throughput??
   - Have only one consumer in a consumer group
   - now each entry would be read by only one consumer
 
+### How to ensure ordering of messages
+Determine if ordering is really necessary?
+Considering two events where order matters: insert a name-> update a name 
+The update shouldn't happen before insert.
+
+To ensure this?
+- write events related to one order to one partition only
+- this ensures only one consumer would process these data
+
+**How to ensure ordering in the face of failure?**
+Failure might be due to deserialization etc..
+lets say, insert failed, then we would not want to update it.
+
+This can be handled by a bit of sanity check:
+
+in this case, check if data has went through insert phase -> check in cache/db or add this piece of info while adding next event.
+
+```java
+boolean insertConsumer(data) {
+    data.isCreated = True
+    createEvent(update, data);
+}
+
+boolean updateConsumer(data) {
+    if(data.isCreated) {
+        do something
+    } else {
+        log/throw/instrument/fail
+    }
+}
+```
+
+### How producer decides a partition to write to?
+The producer will decide target partition to place any message, depending on:
+- `Partition id`, if it's specified within the message
+- `key % num partitions`, if no partition id is mentioned
+- Round robin if neither partition id nor message key is available in the message means only the value is available
+
+### Kafka Rebalancing
+- Re-balance is the re-assignment of partition ownership among consumers within a given consumer group.
+- A Re-balance happens when:
+  - a consumer JOINS the group 
+  - a consumer SHUTS DOWN cleanly 
+  - a consumer is considered DEAD by the group coordinator. (when consumer crash or is busy with a long-running processing) -> no heartbeats sent in the meanwhile by the consumer to the group coordinator within the configured session interval 
+  - new partitions are added
+
+For a Consumer Group:
+  - Group Coordinator: is one of the brokers in the cluster
+  - Group Leader: is the first consumer that joins a group
+
+Rebalance can be more or less described as follows:
+  - The leader receives a list of all consumers in the group from the group coordinator
+  - this list will include all consumers that sent a heartbeat recently and which are therefore considered alive
+  - the leader is responsible for assigning a subset of partitions to each consumer. 
+  - After deciding on the partition assignment (Kafka has a couple built-in partition assignment policies), the group leader sends the list of assignments to the group coordinator, which sends this information to all the consumers.
+
 <hr>
 
 ## Setup
