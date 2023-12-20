@@ -181,3 +181,168 @@ $ bin/zookeeper-server-start.sh config/zookeeper.properties
 $ bin/kafka-server-start.sh config/server.properties
 ```
 
+## Spring Implementation
+
+- dependency in POM
+```xml
+<dependency>
+    <groupId>org.springframework.kafka</groupId>
+    <artifactId>spring-kafka</artifactId>
+    <version>3.1.0</version>
+</dependency>
+```
+
+- Creating Topics Programmatically
+
+We need to add the KafkaAdmin Spring bean, which will automatically add topics for all beans of type NewTopic:
+```java
+@Configuration
+public class KafkaTopicConfig {
+    
+    @Value(value = "${spring.kafka.bootstrap-servers}")
+    private String bootstrapAddress;
+
+    @Bean
+    public KafkaAdmin kafkaAdmin() {
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        return new KafkaAdmin(configs);
+    }
+    
+    @Bean
+    public NewTopic topic1() {
+         return new NewTopic("baeldung", 1, (short) 1);
+    }
+}
+```
+
+- Create producer configs
+
+```java
+package com.neatcode.kafka.config;
+
+@Configuration
+class KafkaProducerConfig {
+
+    @Value(value = "${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
+
+    /**
+     * BOOTSTRAP_SERVERS_CONFIG - Host and port on which Kafka is running.
+     * KEY_SERIALIZER_CLASS_CONFIG - Serializer class to be used for the key.
+     * VALUE_SERIALIZER_CLASS_CONFIG - Serializer class to be used for the value.
+     */
+    @Bean
+    public Map<String, Object> producerConfigs() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        return props;
+    }
+
+    /**
+     * ProducerFactory is responsible for creating Kafka Producer instances.
+     * Producer instances are thread safe.
+     * Using a single instance throughout an application context will give higher performance.
+     */
+    @Bean
+    public ProducerFactory<String, String> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
+    }
+
+    /**
+     * we need a KafkaTemplate, which wraps a Producer instance and
+     * provides convenience methods for sending messages to Kafka topics.
+     *
+     * Consequently, KakfaTemplate instances are also thread safe, and use of one instance is recommended.
+     */
+    @Bean
+    public KafkaTemplate<String, String> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+}
+
+```
+
+- create consumer config
+
+```java
+@EnableKafka
+@Configuration
+class KafkaConsumerConfig {
+
+    @Value(value = "${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
+
+    @Value(value = "${spring.consumer.group-id}")
+    private String consumerGroupId;
+
+    @Bean
+    public Map<String, Object> consumerConfigs() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupId);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        return props;
+    }
+
+    @Bean
+    public ConsumerFactory<String, String> consumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory());
+        return factory;
+    }
+}
+```
+
+- create kafka producer
+```java
+@Service
+public class KafkaProducer {
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    /**
+     * The send API returns a CompletableFuture object.
+     * If we want to block the sending thread and get the result about the sent message, we can call the get API of the CompletableFuture object.
+     * The thread will wait for the result, but it will slow down the producer.
+     *
+     * Kafka is a fast-stream processing platform.
+     * Therefore, it’s better to handle the results asynchronously so that the subsequent messages do not wait for the result of the previous message.
+     * We can do this through a callback:
+     */
+    public void sendMessage(String topicName, String message) {
+        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topicName, message);
+        future.whenComplete((result, ex) -> {
+            if (ex == null) {
+                System.out.println("Sent message=[" + message +
+                    "] with offset=[" + result.getRecordMetadata().offset() + "]");
+            } else {
+                System.out.println("Unable to send message=[" +
+                    message + "] due to : " + ex.getMessage());
+            }
+        });
+    }
+}
+```
+
+- create kafka consumer
+```java
+@Service
+public class KafkaConsumer {
+
+    @KafkaListener(topics = "topic_1", groupId = "foo")
+    public void listenGroupFoo(String message) {
+        System.out.println("Received Message in group foo: " + message);
+    }
+}
+
+```
