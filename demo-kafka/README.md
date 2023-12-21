@@ -5,6 +5,22 @@
   - ActiveMQ
   - Apache Pulsar
 
+### Data Integration Challenges
+A typical organization has multiple sources of data with disparate data formats. 
+Data integration involves combining data from these multiple sources into one unified view of their business.
+Each integration comes with difficulties around:
+  - **Protocol** – how the data is transported (TCP, HTTP, REST, FTP, JDBC…)
+  - **Data format** – how the data is parsed (Binary, CSV, JSON, Avro…)
+  - **Data schema & evolution** – how the data is shaped and may change
+
+These direct integrations can result in a complicated solution as shown below.
+
+<img src="images/kafka_with_kafka.png">
+
+Apache Kafka allows us to decouple data streams and systems.
+
+
+
 ### Kafka Components
 - **Record**
   - data or event
