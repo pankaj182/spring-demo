@@ -53,6 +53,8 @@ Apache Kafka allows us to decouple data streams and systems.
 - **Zookeeper**
   - Kafka relies on Apache ZooKeeper for distributed coordination and management of its cluster.
 
+<img src="image/kafka_setup.png" width="720px">
+
 ### Features:
   - **Distributed**
   - **Fault Tolerant**
