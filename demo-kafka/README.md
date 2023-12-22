@@ -15,9 +15,11 @@ Each integration comes with difficulties around:
 
 These direct integrations can result in a complicated solution as shown below.
 
-<img src="images/kafka_with_kafka.png">
+<img src="image/kafka_without_kafka.png" width="400px">
 
 Apache Kafka allows us to decouple data streams and systems.
+
+<img src="image/kafka_with_kafka.png" width="400px">
 
 
 
@@ -50,6 +52,8 @@ Apache Kafka allows us to decouple data streams and systems.
   - _Each partition within a topic is consumed by only one consumer within a group, but multiple partitions can be processed simultaneously by different consumers in the group._
 - **Zookeeper**
   - Kafka relies on Apache ZooKeeper for distributed coordination and management of its cluster.
+
+<img src="image/kafka_setup.png" width="720px">
 
 ### Features:
   - **Distributed**
