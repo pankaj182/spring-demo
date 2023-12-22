@@ -25,6 +25,8 @@
 		<module>services-rest</module>
 		<module>demo-actuator</module>
 		<module>demo-kafka</module>
+		<module>demo-service-discovery</module>
+		<module>demo-service-discovery-client</module>
 	</modules>
 
 	<dependencies>
